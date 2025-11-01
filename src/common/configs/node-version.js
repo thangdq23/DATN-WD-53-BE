@@ -2,7 +2,7 @@ import { NODE_ENV } from "./environment.js";
 import semver from "semver";
 
 export function checkVersion() {
-  const requiredVersion = ">=22.0.0";
+  const requiredVersion = ">=20.0.0";
   const currentVersion = process.version;
 
   if (

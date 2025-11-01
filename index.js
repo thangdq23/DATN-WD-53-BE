@@ -8,9 +8,10 @@ import notFoundHandler from "./src/common/middlewares/not-found.middleware.js";
 import routes from "./src/routes.js";
 import { checkVersion } from "./src/common/configs/node-version.js";
 import connectDB from "./src/common/configs/database.js";
+import dotenv from "dotenv";
 
 checkVersion();
-
+dotenv.config({});
 const app = express();
 
 app.use(express.json());
