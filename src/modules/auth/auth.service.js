@@ -1,5 +1,11 @@
-import { JWT_ACCESS_EXPIRED, JWT_ACCESS_SECRET } from "../config/jwt.config.js";
-import { throwError, throwIfDuplicate } from "../../common/utils/error.util.js";
+import {
+  JWT_ACCESS_EXPIRED,
+  JWT_ACCESS_SECRET,
+} from "../../common/configs/environment.js";
+import {
+  throwError,
+  throwIfDuplicate,
+} from "../../common/utils/create-response.js";
 import User from "../user/user.model.js";
 import { comparePassword, generateToken, hashPassword } from "./auth.utils.js";
 
