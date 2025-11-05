@@ -1,0 +1,298 @@
+{
+	"info": {
+		"_postman_id": "f5c4a045-53c7-43a6-be5e-2984a9b6b995",
+		"name": "MPV TICKET",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33950988"
+	},
+	"item": [
+		{
+			"name": "GENRE",
+			"item": [
+				{
+					"name": "GET ALL",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/genre?pagination=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"genre"
+							],
+							"query": [
+								{
+									"key": "pagination",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET DETAIL",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/genre/detail/6909c765aeec51b1dc629b14",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"genre",
+								"detail",
+								"6909c765aeec51b1dc629b14"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE GENRE",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Kinh dị\",\n    \"description\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/genre",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"genre"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE GENRE",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Kinh dị\",\n    \"description\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/genre/update/6909c765aeec51b1dc629b14",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"genre",
+								"update",
+								"6909c765aeec51b1dc629b14"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE STATUS",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Kinh dị\",\n    \"description\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/genre/status/6909c765aeec51b1dc629b14",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"genre",
+								"status",
+								"6909c765aeec51b1dc629b14"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MOVIE",
+			"item": [
+				{
+					"name": "GET ALL",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/movie?pagination=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"movie"
+							],
+							"query": [
+								{
+									"key": "pagination",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET DETAIL",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/movie/detail/6909d4a1b56fb5295f4341c0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"movie",
+								"detail",
+								"6909d4a1b56fb5295f4341c0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE FLIM",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Godzilla x Kong: Đế Vương Trỗi Dậy\",\n  \"description\": \"Hai quái thú huyền thoại hợp sức bảo vệ Trái Đất trước mối đe dọa mới từ sâu thẳm lòng đất.\",\n  \"poster\": \"https://example.com/posters/godzilla-x-kong.jpg\",\n  \"genreIds\": [\"6909c765aeec51b1dc629b14\"],\n  \"trailer\": \"https://www.youtube.com/watch?v=example_trailer\",\n  \"actor\": [\n    \"Rebecca Hall\",\n    \"Brian Tyree Henry\",\n    \"Dan Stevens\"\n  ],\n  \"director\": \"Adam Wingard\",\n  \"rating\": 8.3,\n  \"ageRestriction\": \"C13\",\n  \"duration\": 115,\n  \"status\": \"nowShowing\",\n  \"releaseDate\": \"2025-11-29T00:00:00.000Z\",\n  \"country\": \"Mỹ\",\n  \"language\": \"Tiếng Anh\",\n  \"subTitleLanguage\": \"Tiếng Việt\",\n  \"isHot\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/movie",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"movie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE FLIM",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Godzilla x Kong: Đế Vương Trỗi Dậy\",\n  \"description\": \"Hai quái thú huyền thoại hợp sức bảo vệ Trái Đất trước mối đe dọa mới từ sâu thẳm lòng đất.\",\n  \"poster\": \"https://example.com/posters/godzilla-x-kong.jpg\",\n  \"genreIds\": [\"6909c765aeec51b1dc629b14\"],\n  \"trailer\": \"https://www.youtube.com/watch?v=example_trailer\",\n  \"actor\": [\n    \"Rebecca Hall\",\n    \"Brian Tyree Henry\",\n    \"Dan Stevens\"\n  ],\n  \"director\": \"Adam Wingard\",\n  \"rating\": 8.3,\n  \"ageRestriction\": \"C13\",\n  \"duration\": 115,\n  \"releaseDate\": \"2025-11-29T00:00:00.000Z\",\n  \"country\": \"Mỹ\",\n  \"language\": \"Tiếng Anh\",\n  \"subTitleLanguage\": \"Tiếng Việt\",\n  \"isHot\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/movie/update/6909d4a1b56fb5295f4341c0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"movie",
+								"update",
+								"6909d4a1b56fb5295f4341c0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE STATUS FLIM",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Godzilla x Kong: Đế Vương Trỗi Dậy\",\n  \"description\": \"Hai quái thú huyền thoại hợp sức bảo vệ Trái Đất trước mối đe dọa mới từ sâu thẳm lòng đất.\",\n  \"poster\": \"https://example.com/posters/godzilla-x-kong.jpg\",\n  \"genreIds\": [\"6909c765aeec51b1dc629b14\"],\n  \"trailer\": \"https://www.youtube.com/watch?v=example_trailer\",\n  \"actor\": [\n    \"Rebecca Hall\",\n    \"Brian Tyree Henry\",\n    \"Dan Stevens\"\n  ],\n  \"director\": \"Adam Wingard\",\n  \"rating\": 8.3,\n  \"ageRestriction\": \"C13\",\n  \"duration\": 115,\n  \"status\": \"nowShowing\",\n  \"releaseDate\": \"2025-11-29T00:00:00.000Z\",\n  \"country\": \"Mỹ\",\n  \"language\": \"Tiếng Anh\",\n  \"subTitleLanguage\": \"Tiếng Việt\",\n  \"isHot\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/movie/status/6909d4a1b56fb5295f4341c0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"movie",
+								"status",
+								"6909d4a1b56fb5295f4341c0"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
