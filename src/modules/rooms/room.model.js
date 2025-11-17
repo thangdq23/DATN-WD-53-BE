@@ -6,14 +6,13 @@ const roomSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    description: {
-      type: String,
-    },
+    description: String,
     capacity: {
       type: Number,
-      default: 0,
-      min: 0,
+      default: 120,
     },
+    cols: Number,
+    rows: Number,
     status: {
       type: Boolean,
       default: true,
