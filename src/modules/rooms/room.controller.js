@@ -1,6 +1,6 @@
-import handleAsync from "../../common/utils/async-handler";
-import createResponse from "../../common/utils/create-response";
-import { createRoomService, updateRoomService } from "./room.service";
+import handleAsync from "../../common/utils/async-handler.js";
+import createResponse from "../../common/utils/create-response.js";
+import { createRoomService, updateRoomService } from "./room.service.js";
 
 export const createRoom = handleAsync(async (req, res) => {
   const { body } = req;

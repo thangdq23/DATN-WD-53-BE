@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { createRoom, updateRoom } from "./room.controller";
+import { createRoom, updateRoom } from "./room.controller.js";
 
-const roomRouter = Router();
-roomRouter.post("/", createRoom);
-roomRouter.patch("/update/:id", updateRoom);
-export default roomRouter;
+const roomRoute = Router();
+roomRoute.post("/", createRoom);
+roomRoute.patch("/update/:id", updateRoom);
+export default roomRoute;

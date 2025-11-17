@@ -1,6 +1,6 @@
-import { throwError } from "../../common/utils/create-response";
-import Seat from "../seat/seat.model";
-import Room from "./room.model";
+import { throwError } from "../../common/utils/create-response.js";
+import Seat from "../seat/seat.model.js";
+import Room from "./room.model.js";
 
 export const createRoomService = async (payload) => {
   const existing = await Room.findOne({
