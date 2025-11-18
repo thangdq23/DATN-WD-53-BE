@@ -9,6 +9,7 @@ import routes from "./src/routes.js";
 import { checkVersion } from "./src/common/configs/node-version.js";
 import connectDB from "./src/common/configs/database.js";
 import dotenv from "dotenv";
+import { movieStatusJob } from "./src/jobs/statusMovieJob.js";
 
 checkVersion();
 dotenv.config({});
@@ -27,6 +28,7 @@ let server;
 
 connectDB()
   .then(() => {
+    movieStatusJob();
     server = app.listen(PORT, () => {
       if (NODE_ENV === "development") {
         console.log(`http://localhost:${PORT}/api`);
