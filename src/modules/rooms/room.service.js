@@ -1,6 +1,24 @@
+import { apiQuery } from "../../common/utils/api-query.js";
 import { throwError } from "../../common/utils/create-response.js";
 import Seat from "../seat/seat.model.js";
 import Room from "./room.model.js";
+
+export const getSeatByRoomService = async (roomId) => {
+  const room = await Room.findById(roomId);
+  if (!room) throwError(404, "Không tìm thấy phòng chiếu!");
+  const seats = await Seat.find({ roomId: room._id });
+  return { ...room.toObject(), seats };
+};
+
+export const getAllRoomService = async (query) => {
+  const data = await apiQuery(Room, query);
+  return data;
+};
+
+export const getDetailRoomService = async (id) => {
+  const data = await Room.findById(id);
+  return data;
+};
 
 export const createRoomService = async (payload) => {
   const existing = await Room.findOne({
@@ -56,4 +74,17 @@ export const updateRoomService = async (id, payload) => {
     }
   }
   return updatedRoom;
+};
+
+export const updateRoomStatusService = async (id) => {
+  const findRoom = await Room.findById(id);
+  if (!findRoom) throwError(404, "Phòng chiếu không tồn tại!");
+  findRoom.status = !findRoom.status;
+  const updated = await findRoom.save();
+  return {
+    data: updated,
+    message: updated.status
+      ? "Kích hoạt phòng chiếu thành công. Các xuất chiếu sẽ hoạt động trở lại"
+      : "Khoá phòng thành công. Các xuất chiếu sẽ bị tạm ngưng!",
+  };
 };
