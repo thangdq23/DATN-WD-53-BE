@@ -49,7 +49,7 @@ export const createMovieService = async (payload) => {
 export const updateMovieService = async (id, payload) => {
   const movie = await Movie.findById(id);
   if (!movie) throwError(404, "Không tìm thấy phim trong hệ thống!");
-  if (payload.name){
+  if (payload.name) {
     const existingMovie = await Movie.findOne({
       _id: { $ne: id },
       name: { $regex: `^${payload.name}$`, $options: "i" },
@@ -96,7 +96,7 @@ export const updateMovieService = async (id, payload) => {
   Object.assign(movie, payload);
   await movie.save();
 
-  return movie;  
+  return movie;
 };
 
 export const updateStatusMovieService = async (id) => {
