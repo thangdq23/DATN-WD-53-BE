@@ -27,7 +27,7 @@ export const createRoomService = async (payload) => {
   if (existing) throwError(400, "Phòng chiếu này đã tồn tại trong hệ thống!");
 
   const room = await Room.create({ ...payload });
-  const seatWithId = payload.seat.map((item) => ({
+  const seatWithId = payload.seats.map((item) => ({
     ...item,
     roomId: room._id,
   }));
