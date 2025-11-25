@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { SHOWTIME_STATUS } from "../../common/constants/showtime";
 
 const showtimeSchema = new mongoose.Schema(
   {
@@ -6,18 +7,21 @@ const showtimeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Movie",
       required: true,
-      index: true,
     },
 
     roomId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Room",
       required: true,
-      index: true,
     },
 
     startTime: {
       type: Date,
+      required: true,
+    },
+
+    dayOfWeek: {
+      type: Number,
       required: true,
     },
 
@@ -26,28 +30,31 @@ const showtimeSchema = new mongoose.Schema(
       required: true,
     },
 
-    price: {
-      type: Number,
-      default: 80000,
-    },
-
-    status: {
-      type: Boolean,
-      default: true,
-    },
-
-    seats: [
+    price: [
       {
-        seatId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Seat",
+        seatType: {
+          type: String,
+          required: true,
         },
-        label: String,
-        type: String,
-        status: Boolean,
-        isBooked: { type: Boolean, default: false },
+        value: {
+          type: Number,
+          required: true,
+        },
       },
     ],
+
+    status: {
+      type: String,
+      enum: Object.values(SHOWTIME_STATUS),
+      default: SHOWTIME_STATUS.SCHEDULED,
+    },
+
+    cancelDescription: {
+      type: String,
+      required: function () {
+        return this.status === SHOWTIME_STATUS.CANCELLED;
+      },
+    },
   },
   { timestamps: true, versionKey: false },
 );
