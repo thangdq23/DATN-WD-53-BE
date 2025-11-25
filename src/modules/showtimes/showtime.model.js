@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { SHOWTIME_STATUS } from "../../common/constants/showtime";
+import { SHOWTIME_STATUS } from "../../common/constants/showtime.js";
 
 const showtimeSchema = new mongoose.Schema(
   {
