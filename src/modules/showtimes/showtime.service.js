@@ -1,30 +1,85 @@
+import dayjs from "dayjs";
 import { apiQuery } from "../../common/utils/api-query.js";
 import { throwError } from "../../common/utils/create-response.js";
 import Movie from "../movie/movie.model.js";
 import Room from "../rooms/room.model.js";
 import Seat from "../seat/seat.model.js";
 import Showtime from "./showtime.model.js";
+import {
+  calculatorEndTime,
+  checkAvaiableMovie,
+  checkAvaiableRoom,
+  checkConflictShowtime,
+} from "./showtime.utils.js";
+import { SHOWTIME_STATUS } from "../../common/constants/showtime.js";
+import e from "express";
 
 export const getAllShowtimeService = async (query) => {
-  const result = await apiQuery(Showtime, query, {
-    populate: [
-      { path: "movieId", select: "name poster status statusRelease duration" },
-      { path: "roomId", select: "name status" },
-    ],
+  const showtimes = await apiQuery(Showtime, query, {
+    populate: [{ path: "movieId" }, { path: "roomId" }],
   });
-  return result;
+  return showtimes;
 };
 
 export const getDetailShowtimeService = async (id) => {
-  const data = await Showtime.findById(id)
-    .populate({
-      path: "movieId",
-      select: "name poster status statusRelease duration",
-    })
-    .populate({ path: "roomId", select: "name status" });
-  if (!data) throwError(404, "Không tìm thấy lịch chiếu!");
-  return data;
+  const showtime = (await Showtime.findById(id))
+    .populated("movieId")
+    .populate("roomId");
+  return showtime;
 };
+
+export const getMovieHasShowtimeService = async (query) => {
+  const { page = 1, limit = 10, ...otherQuery } = query;
+  const { data } = await getAllShowtimeService(otherQuery);
+
+  const moviesMap = new Map();
+
+  for (const showtime of data ) {
+    const movieId = `${showtime.movieId._id}`;
+    const startTime = dayjs(showtime.startTime);
+    const dayOfWeek = startTime.day();
+    if (moviesMap.has(movieId)) {
+      const existing = moviesMap.get(movieId);
+      existing.showtimeCount += 1;
+      if (startTime.isBefore(existing.firstStartTime)) {
+        existing.firstStartTime =  startTime;
+      }
+      if (startTime.isAfter(existing.lastStartTime)) {
+        existing.lastStartTime = startTime;
+      }
+      existing.dayOfWeek.add(dayOfWeek);
+    } else {
+      moviesMap.set(movieId, {
+        ...showtime.movieId.toObject(),
+        showtimeCount: 1,
+        firstStartTime: startTime,
+        lastStartTime: startTime,
+        dayOfWeek: new Set([dayOfWeek]),
+      });
+    }
+  }  
+  const movies = Array.from(moviesMap.values()).map((movie) => ({
+    ...movie,
+    firstStartTime: movie.firstStartTime.toDate(),
+    lastStartTime: movie.lastStartTime.toDate(),
+    dayOfWeek: Array.from(movie.dayOfWeek).sort(),
+  }));
+
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  const pagedMovies = movies.slice(startIndex, endIndex);
+
+  return {
+    data: pagedMovies,
+    meta: {
+      total: movies.length,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(movies.length / limit),
+    },
+  };
+};
+
 export const createShowtimeService = async (payload) => {
   const { movieId, roomId, startTime, endTime, price } = payload;
 
