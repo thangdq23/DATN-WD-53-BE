@@ -34,7 +34,7 @@ export const getMovieHasShowtimeService = async (query) => {
 
   const moviesMap = new Map();
 
-  for (const showtime of data ) {
+  for (const showtime of data) {
     const movieId = `${showtime.movieId._id}`;
     const startTime = dayjs(showtime.startTime);
     const dayOfWeek = startTime.day();
@@ -42,7 +42,7 @@ export const getMovieHasShowtimeService = async (query) => {
       const existing = moviesMap.get(movieId);
       existing.showtimeCount += 1;
       if (startTime.isBefore(existing.firstStartTime)) {
-        existing.firstStartTime =  startTime;
+        existing.firstStartTime = startTime;
       }
       if (startTime.isAfter(existing.lastStartTime)) {
         existing.lastStartTime = startTime;
@@ -57,7 +57,7 @@ export const getMovieHasShowtimeService = async (query) => {
         dayOfWeek: new Set([dayOfWeek]),
       });
     }
-  }  
+  }
   const movies = Array.from(moviesMap.values()).map((movie) => ({
     ...movie,
     firstStartTime: movie.firstStartTime.toDate(),
@@ -169,16 +169,18 @@ export const createMultipleShowtimesService = async (payload) => {
   return created;
 };
 
-export const updateShowtimeService = async (id) => {
+export const updateShowtimeService = async (payload, id) => {
+  const { roomId, startTime, endTime } = payload;
   const showtime = await Showtime.findById(id);
-  if (!showtime) throwError(404, "Lịch chiếu không tồn tại!");
+  if (!showtime) throwError(404, "Xuất chiếu không tồn tại!");
+  if (showtime.status === SHOWTIME_STATUS.IN_PROGRESS)
+    throwError(400, "Không thể cập nhật xuất chiếu đang được chiếu!");
+  const conflict = await checkConflictShowtime(roomId, startTime, endTime, id);
+  if (conflict)
+    throwError(400, `Phòng chiếu ${conflict.roomId.name} đã có xuất chiếu vào lúc ${dayjs(conflict.startTime).format("HH:mm, [Ngày] DD [Tháng] MM [Năm] YYYY")}`,
+  );
+  showtime.set(payload);
+  await showtime.save();
 
-  showtime.status = !showtime.status;
-  const updated = await showtime.save();
-  return {
-    data: updated,
-    message: updated.status
-      ? "Kích hoạt lịch chiếu thành công!"
-      : "Đã đóng lịch chiếu!",
-  };
+  return showtime;
 };
