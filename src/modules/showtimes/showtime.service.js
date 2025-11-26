@@ -81,44 +81,33 @@ export const getMovieHasShowtimeService = async (query) => {
 };
 
 export const createShowtimeService = async (payload) => {
-  const { movieId, roomId, startTime, endTime, price } = payload;
+  const { movieId, roomId, startTime } = payload;
+  if (dayjs(startTime).isBefore(dayjs()))
+    throwError(400, "Thời gian chiếu phải là ngày tương lai!");
+  if (dayjs(startTime).isBefore(dayjs().add(30, "minutes")))
+    throwError(
+      400,
+      "Thời gian chiếu phải cách thời gian hiện tại ít nhất 30 phút!",
+    );
 
-  const movie = await Movie.findById(movieId);
-  if (!movie) throwError(404, "Phim không tồn tại!");
+  const [movie] = await Promise.all([
+    checkAvaiableMovie(movieId),
+    checkAvaiableRoom(roomId),
+  ]);
 
-  const room = await Room.findById(roomId);
-  if (!room) throwError(404, "Phòng chiếu không tồn tại!");
+  const { dayOfWeek, endTime } = calculatorEndTime(movie.duration, startTime);
+  const conflict = await checkConflictShowtime(roomId, startTime, endTime);
+  console.log(conflict);
 
-  const conflict = await Showtime.findOne({
-    roomId,
-    $or: [
-      {
-        startTime: { $lte: endTime },
-        endTime: { $gte: startTime },
-      },
-    ],
-  });
-  if (conflict) throwError(400, "Phòng đã có lịch chiếu trùng thời gian!");
+  if (conflict) {
+    throwError(
+      400,
+      `Phòng chiếu ${conflict.roomId.name} đã có xuất chiếu vào lúc ${dayjs(conflict.startTime).format("HH:mm, [Ngày] DD [Tháng] MM [Năm] YYYY")}`,
+    );
+  }
 
-  const seats = await Seat.find({ roomId });
-  const mappedSeats = seats.map((s) => ({
-    seatId: s._id,
-    label: s.label,
-    type: s.type,
-    status: s.status,
-    isBooked: false,
-  }));
-
-  const created = await Showtime.create({
-    movieId,
-    roomId,
-    startTime,
-    endTime,
-    price,
-    seats: mappedSeats,
-  });
-
-  return created;
+  const showtime = await Showtime.create({ ...payload, dayOfWeek, endTime });
+  return showtime;
 };
 
 export const createMultipleShowtimesService = async (payload) => {
