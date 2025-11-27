@@ -10,6 +10,7 @@ import {
   checkAvaiableMovie,
   checkAvaiableRoom,
   checkConflictShowtime,
+  generateShowtime,
 } from "./showtime.utils.js";
 import { SHOWTIME_STATUS } from "../../common/constants/showtime.js";
 import e from "express";
@@ -110,52 +111,23 @@ export const createShowtimeService = async (payload) => {
   return showtime;
 };
 
-export const createMultipleShowtimesService = async (payload) => {
-  const { movieId, roomId, itmes } = payload;
-
-  const movie = await Movie.findById(movieId);
-  if (!movie) throwError(404, "Phim không tồn tại!");
-
-  const room = await Room.findById(roomId);
-  if (!room) throwError(404, "Phòng chiếu không tồn tại!");
-
-  const seats = await Seat.find({ roomId });
-
-  const seatSnapshot = seats.map((s) => ({
-    seatId: s._id,
-    label: s.label,
-    type: s.type,
-    status: s.status,
-    isBooked: false,
-  }));
-
-  const results = [];
-
-  for (const item of itmes) {
-    const { startTime, endTime } = item;
-    const conflict = await Showtime.findOne({
-      roomId,
-      $or: [{ startTime: { $lte: endTime }, endTime: { $gte: startTime } }],
-    });
-
-    if (conflict)
-      throwError(
-        400,
-        `Phòng đã có lịch chiếu trùng thời gian từ ${startTime} - ${endTime}!`,
-      );
-
-    results.push({
-      movieId,
-      roomId,
-      startTime,
-      endTime,
-      price: item.price || payload.price,
-      seats: seatSnapshot,
-    });
+export const createManyShowtimeService = async (payload) => {
+  const { startDate, endDate, dayOfWeeks, fixedHour, ...otherPayload } =
+    payload;
+  if (!dayjs(startDate).isBefore(dayjs(endDate))) {
+    throwError(400, "Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc");
   }
 
-  const created = await Showtime.insertMany(results);
-  return created;
+  const showtimes = await generateShowtime(
+    otherPayload,
+    startDate,
+    endDate,
+    dayOfWeeks,
+    fixedHour,
+  );
+
+  const createShowtimes = Showtime.insertMany(showtimes);
+  return createShowtimes;
 };
 
 export const updateShowtimeService = async (payload, id) => {
