@@ -3,14 +3,14 @@ import {
   createManyShowtime,
   createShowtime,
   getAllShowtime,
-  getDetailShowtime,
-  updateShowtimeStatus,
+  getMovieHasShowtime,
+  updateShowtime,
 } from "./showtime.controller.js";
 
 const showtimeRoute = Router();
 showtimeRoute.get("/", getAllShowtime);
-showtimeRoute.get("/:id", getDetailShowtime);
+showtimeRoute.get("/movie", getMovieHasShowtime);
 showtimeRoute.post("/", createShowtime);
-showtimeRoute.post("/multiple", createManyShowtime);
-showtimeRoute.patch("/:id/status", updateShowtimeStatus);
+showtimeRoute.post("/many", createManyShowtime);
+showtimeRoute.patch("/update/:id", updateShowtime);
 export default showtimeRoute;
