@@ -138,8 +138,10 @@ export const updateShowtimeService = async (payload, id) => {
     throwError(400, "Không thể cập nhật xuất chiếu đang được chiếu!");
   const conflict = await checkConflictShowtime(roomId, startTime, endTime, id);
   if (conflict)
-    throwError(400, `Phòng chiếu ${conflict.roomId.name} đã có xuất chiếu vào lúc ${dayjs(conflict.startTime).format("HH:mm, [Ngày] DD [Tháng] MM [Năm] YYYY")}`,
-  );
+    throwError(
+      400,
+      `Phòng chiếu ${conflict.roomId.name} đã có xuất chiếu vào lúc ${dayjs(conflict.startTime).format("HH:mm, [Ngày] DD [Tháng] MM [Năm] YYYY")}`,
+    );
   showtime.set(payload);
   await showtime.save();
 
