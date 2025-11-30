@@ -112,8 +112,8 @@ function applyFilter(key, value, queryConditions) {
     return;
   }
 
-  if (typeof value === "string") {
-    queryConditions[key] = { $regex: new RegExp(`^${value}$`, "i") };
+  if (!isNaN(value)) {
+    queryConditions[key] = value;
     return;
   }
 
