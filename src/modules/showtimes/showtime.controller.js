@@ -5,21 +5,21 @@ import {
   createManyShowtimeService,
   createShowtimeService,
   getAllShowtimeService,
-  getDetailShowtimeService,
+  getMovieHasShowtimeService,
   updateShowtimeService,
 } from "./showtime.service.js";
 import { DAY_NAMES } from "../../common/constants/showtime.js";
 
 export const getAllShowtime = handleAsync(async (req, res) => {
   const { query } = req;
-  const { data, meta } = await getAllShowtimeService(query);
-  return createResponse(res, 200, "OK", data, meta);
+  const showtimes = await getAllShowtimeService(query);
+  return createResponse(res, 200, "OK", showtimes.data, showtimes.data);
 });
 
-export const getDetailShowtime = handleAsync(async (req, res) => {
-  const { id } = req.params;
-  const data = await getDetailShowtimeService(id);
-  return createResponse(res, 200, "OK", data);
+export const getMovieHasShowtime = handleAsync(async (req, res) => {
+  const { query } = req;
+  const movies = await getMovieHasShowtimeService(query);
+  return createResponse(res, 200, "OK", movies.data, movies.meta);
 });
 
 export const createShowtime = handleAsync(async (req, res) => {
@@ -43,7 +43,8 @@ export const createManyShowtime = handleAsync(async (req, res) => {
   return createResponse(res, 201, message, created);
 });
 
-export const updateShowtimeStatus = handleAsync(async (req, res) => {
-  const data = await updateShowtimeService(req.params.id);
-  return createResponse(res, 200, data.message, data.data);
+export const updateShowtime  = handleAsync(async (req, res) => {
+  const { body, params } = req;
+  const data = await updateShowtimeService(body, params);
+  return createResponse(res, 200, "Cập nhật xuất chiếu thành công!", data);
 });
