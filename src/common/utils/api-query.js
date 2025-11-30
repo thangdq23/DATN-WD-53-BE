@@ -45,7 +45,7 @@ export const apiQuery = async (Model, queryParams, options = {}) => {
     populate.forEach((pop) => {
       query = query.populate({
         path: pop.path,
-        select: pop.select || "null",
+        select: pop.select || null,
         populate: pop.populate || undefined,
       });
     });
@@ -114,6 +114,11 @@ function applyFilter(key, value, queryConditions) {
 
   if (!isNaN(value)) {
     queryConditions[key] = value;
+    return;
+  }
+
+  if (typeof value === "string") {
+    queryConditions[key] = { $regex: new RegExp(`^${value}$`, "i") };
     return;
   }
 
