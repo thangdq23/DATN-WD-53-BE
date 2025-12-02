@@ -5,6 +5,7 @@ import {
   createManyShowtimeService,
   createShowtimeService,
   getAllShowtimeService,
+  getShowtimesByWeekdayService,
   getMovieHasShowtimeService,
   updateShowtimeService,
 } from "./showtime.service.js";
@@ -14,6 +15,12 @@ export const getAllShowtime = handleAsync(async (req, res) => {
   const { query } = req;
   const showtimes = await getAllShowtimeService(query);
   return createResponse(res, 200, "OK", showtimes.data, showtimes.data);
+});
+
+export const getShowtimesByWeekday = handleAsync(async (req, res) => {
+  const { query } = req;
+  const showtimes = await getShowtimesByWeekdayService(query);
+  return createResponse(res, 200, "OK", showtimes.data, showtimes.meta);
 });
 
 export const getMovieHasShowtime = handleAsync(async (req, res) => {

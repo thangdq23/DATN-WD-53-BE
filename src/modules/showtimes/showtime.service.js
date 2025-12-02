@@ -1,9 +1,6 @@
 import dayjs from "dayjs";
 import { apiQuery } from "../../common/utils/api-query.js";
 import { throwError } from "../../common/utils/create-response.js";
-import Movie from "../movie/movie.model.js";
-import Room from "../rooms/room.model.js";
-import Seat from "../seat/seat.model.js";
 import Showtime from "./showtime.model.js";
 import {
   calculatorEndTime,
@@ -13,13 +10,26 @@ import {
   generateShowtime,
 } from "./showtime.utils.js";
 import { SHOWTIME_STATUS } from "../../common/constants/showtime.js";
-import e from "express";
+import { createPagination } from "../../common/utils/create-pagination.js";
 
 export const getAllShowtimeService = async (query) => {
   const showtimes = await apiQuery(Showtime, query, {
     populate: [{ path: "movieId" }, { path: "roomId" }],
   });
   return showtimes;
+};
+
+export const getShowtimesByWeekdayService = async (query) => {
+  const { page = 1, limit = 10, pagination = true, ...otherQuery } = query;
+  const showtimes = await getAllShowtimeService(otherQuery);
+  const map = {};
+  showtimes.data.forEach((st) => {
+    if (!st.movieId) return;
+    const dateKey = dayjs(st.startTime).format("YYYY-MM-DD");
+    if (!map[dateKey]) map[dateKey] = [];
+    map[dateKey].push(st);
+  });
+  return pagination ? createPagination(map, Number(page), Number(limit)) : map;
 };
 
 export const getDetailShowtimeService = async (id) => {
