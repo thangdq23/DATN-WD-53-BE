@@ -5,4 +5,3 @@ const checkoutRoute = Router();
 checkoutRoute.post("/", checkout);
 
 export default checkoutRoute;
-
