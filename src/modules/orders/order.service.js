@@ -17,7 +17,12 @@ const generateCode = () => {
 };
 
 export const checkoutService = async (payload) => {
-  const { showtimeId, seatIds = [], userId = null, paymentMethod = "cash" } = payload;
+  const {
+    showtimeId,
+    seatIds = [],
+    userId = null,
+    paymentMethod = "cash",
+  } = payload;
   if (!showtimeId) throwError(400, "Thiếu thông tin xuất chiếu!");
   if (!Array.isArray(seatIds) || seatIds.length === 0)
     throwError(400, "Vui lòng chọn ghế!");
@@ -28,7 +33,8 @@ export const checkoutService = async (payload) => {
     throwError(400, "Xuất chiếu không khả dụng để đặt vé!");
 
   const seats = await Seat.find({ _id: { $in: seatIds } });
-  if (seats.length !== seatIds.length) throwError(400, "Một số ghế không tồn tại!");
+  if (seats.length !== seatIds.length)
+    throwError(400, "Một số ghế không tồn tại!");
   const invalidSeat = seats.find(
     (s) => `${s.roomId}` !== `${showtime.roomId}` || !s.status,
   );
@@ -37,7 +43,8 @@ export const checkoutService = async (payload) => {
   const priceMap = buildPriceMap(showtime);
   const seatDetails = seats.map((s) => {
     const base = priceMap[s.type];
-    if (base == null) throwError(400, `Chưa cấu hình giá cho loại ghế ${s.type}!`);
+    if (base == null)
+      throwError(400, `Chưa cấu hình giá cho loại ghế ${s.type}!`);
     const price = Number(base) * Number(s.span || 1);
     return {
       seatId: s._id,
@@ -77,4 +84,3 @@ export const checkoutService = async (payload) => {
     throw err;
   }
 };
-

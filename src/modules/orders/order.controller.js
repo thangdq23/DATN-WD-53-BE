@@ -7,4 +7,3 @@ export const checkout = handleAsync(async (req, res) => {
   const data = await checkoutService(body);
   return createResponse(res, 201, "Đặt vé thành công", data);
 });
-
