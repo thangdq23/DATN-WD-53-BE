@@ -10,6 +10,7 @@ import { checkVersion } from "./src/common/configs/node-version.js";
 import connectDB from "./src/common/configs/database.js";
 import dotenv from "dotenv";
 import { movieStatusJob } from "./src/jobs/statusMovieJob.js";
+import { seatStatusJob } from "./src/jobs/seatStatusJob.js";
 
 checkVersion();
 dotenv.config({});
@@ -28,6 +29,7 @@ let server;
 
 connectDB()
   .then(() => {
+    seatStatusJob();
     movieStatusJob();
     server = app.listen(PORT, () => {
       if (NODE_ENV === "development") {

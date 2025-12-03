@@ -1,5 +1,5 @@
-import { throwError } from "../../common/utils/create-response";
-import SeatStatus from "./seatStatus.model";
+import { throwError } from "../../common/utils/create-response.js";
+import SeatStatus from "./seatStatus.model.js";
 
 export const getSeatStatusByShowtimeService = async (showtimeId) => {
   const data = await SeatStatus.find({ showtimeId })
