@@ -30,6 +30,13 @@ const showtimeSchema = new mongoose.Schema(
       required: true,
     },
 
+    reservedSeats: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Seat",
+      },
+    ],
+
     price: [
       {
         seatType: {
