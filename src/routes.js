@@ -5,6 +5,7 @@ import movieRoute from "./modules/movie/movie.routes.js";
 import roomRoute from "./modules/rooms/room.routes.js";
 
 import showtimeRoute from "./modules/showtimes/showtime.routes.js";
+import checkoutRoute from "./modules/orders/order.routes.js";
 
 const routes = Router();
 
@@ -13,4 +14,5 @@ routes.use("/genre", genreRoute);
 routes.use("/movie", movieRoute);
 routes.use("/room", roomRoute);
 routes.use("/showtime", showtimeRoute);
+routes.use("/checkout", checkoutRoute);
 export default routes;
