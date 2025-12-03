@@ -11,7 +11,8 @@ import connectDB from "./src/common/configs/database.js";
 import dotenv from "dotenv";
 import { movieStatusJob } from "./src/jobs/statusMovieJob.js";
 import { seatStatusJob } from "./src/jobs/seatStatusJob.js";
-
+import { initSocket } from "./src/modules/socket/index.js";
+import http from "http";
 checkVersion();
 dotenv.config({});
 const app = express();
@@ -29,11 +30,15 @@ let server;
 
 connectDB()
   .then(() => {
+    console.log("✓ Connected to MongoDB");
+    server = http.createServer(app);
+    initSocket(server);
     seatStatusJob();
     movieStatusJob();
-    server = app.listen(PORT, () => {
+    server.listen(PORT, () => {
+      console.log("API Server Started");
       if (NODE_ENV === "development") {
-        console.log(`http://localhost:${PORT}/api`);
+        console.log(`• API: http://localhost:${PORT}/api`);
       }
     });
   })

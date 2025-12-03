@@ -13,7 +13,11 @@ const orderSchema = new mongoose.Schema(
     },
     seats: [
       {
-        seatId: { type: mongoose.Schema.Types.ObjectId, ref: "Seat", required: true },
+        seatId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Seat",
+          required: true,
+        },
         label: { type: String, required: true },
         type: { type: String, required: true },
         span: { type: Number, default: 1 },
@@ -43,4 +47,3 @@ const orderSchema = new mongoose.Schema(
 
 const Order = mongoose.model("Order", orderSchema);
 export default Order;
-
