@@ -2,6 +2,7 @@ import { throwError } from "../../common/utils/create-response.js";
 import Seat from "../seat/seat.model.js";
 import Showtime from "../showtimes/showtime.model.js";
 import Order from "./order.model.js";
+import { apiQuery } from "../../common/utils/api-query.js";
 
 const buildPriceMap = (showtime) => {
   const map = {};
@@ -83,4 +84,22 @@ export const checkoutService = async (payload) => {
     );
     throw err;
   }
+};
+
+export const getMyOrdersService = async (userId, query) => {
+  if (!userId) throwError(400, "Thiếu thông tin người dùng!");
+  const filters = { ...query, userId };
+  const result = await apiQuery(Order, filters, {
+    populate: [
+      {
+        path: "showtimeId",
+        select: "startTime endTime roomId movieId",
+        populate: [
+          { path: "movieId", select: "name poster duration" },
+          { path: "roomId", select: "name" },
+        ],
+      },
+    ],
+  });
+  return result;
 };
