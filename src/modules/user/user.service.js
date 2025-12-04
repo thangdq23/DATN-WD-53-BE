@@ -1,9 +1,11 @@
+import { apiQuery } from "../../common/utils/api-query.js";
 import { throwError } from "../../common/utils/create-response.js";
 import User from "./user.model.js";
 import bcrypt from "bcryptjs";
 
-export const getAllUserService = async () => {
-  return await User.find().sort({ createdAt: -1 });
+export const getAllUserService = async (query) => {
+  const data = await apiQuery(User, query);
+  return data;
 };
 
 export const createUserService = async (data) => {
