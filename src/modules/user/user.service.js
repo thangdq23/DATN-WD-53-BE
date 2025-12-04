@@ -9,14 +9,14 @@ export const getAllUserService = async (query) => {
 };
 
 export const createUserService = async (data) => {
-  const { email, password } = data;
+  const { email } = data;
 
   const existedEmail = await User.findOne({ email });
   if (existedEmail) {
     throwError(400, "Email đã tồn tại!");
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash("MPV@123", 10);
   const newUser = await User.create({
     ...data,
     password: hashedPassword,
