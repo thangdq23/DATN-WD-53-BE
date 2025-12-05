@@ -39,7 +39,7 @@ export const checkConflictShowtime = async (
   if (exId) {
     condition._id = { $ne: exId };
   }
-  const conflict = await Showtime.findOne(condition).populate("rommId");
+  const conflict = await Showtime.findOne(condition).populate("roomId");
   return conflict;
 };
 
