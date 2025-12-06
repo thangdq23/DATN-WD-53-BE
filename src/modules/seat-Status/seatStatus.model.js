@@ -1,34 +1,32 @@
 import mongoose from "mongoose";
+import { SEAT_STATUS } from "../../common/constants/seatStatus.js";
 
 const seatStatusSchema = new mongoose.Schema(
   {
     seatId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Seat",
-      required: true,
     },
 
     showtimeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Showtime",
-      required: true,
     },
 
     status: {
       type: String,
-      enum: ["hold", "booked"],
-      required: true,
+      enum: Object.values(SEAT_STATUS),
+      default: SEAT_STATUS.HOLD,
     },
 
     expiredHold: {
-      type: Date,
-      default: null,
+      type: String,
+      default: () => new Date(Date.now() + 5 * 60 * 1000),
     },
 
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      default: null,
     },
   },
   { timestamps: true, versionKey: false },
