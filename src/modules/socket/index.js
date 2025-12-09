@@ -3,7 +3,7 @@ import { socketConfig } from "../../common/configs/socket.js";
 import { setIO } from "./socket.instance.js";
 import authSocketMiddleware from "./middlewares/auth.socket.middleware.js";
 import seatSocketHandler from "./modules/seat.socket.handler.js";
-import { clearExpiredSeatHoldService } from "../seat-Status/seatStatus.service.js";
+import { unHoldSeatService } from "../seat-Status/seatStatus.service.js";
 
 export const initSocket = (httpServer) => {
   const io = new Server(httpServer, socketConfig);
@@ -17,7 +17,7 @@ export const initSocket = (httpServer) => {
     seatSocketHandler(socket, io);
     socket.on("closeTabCheckout", (data) => {
       console.log("Client đóng tab:", socket.id, data);
-      clearExpiredSeatHoldService(data.userId);
+      unHoldSeatService(data.userId);
     });
 
     socket.on("disconnect", () => {
