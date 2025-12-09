@@ -13,13 +13,17 @@ import { movieStatusJob } from "./src/jobs/statusMovieJob.js";
 import { seatStatusJob } from "./src/jobs/seatStatusJob.js";
 import { initSocket } from "./src/modules/socket/index.js";
 import http from "http";
+import { showtimeStatusJob } from "./src/jobs/statusShowtimeJob.js";
 checkVersion();
 dotenv.config({});
 const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use(morgan("dev"));
+if (NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+app.get("/", (_, res) => res.json("hello word"));
 app.use("/api", routes);
 
 app.use(jsonValidator);
@@ -33,6 +37,7 @@ connectDB()
     console.log("✓ Connected to MongoDB");
     server = http.createServer(app);
     initSocket(server);
+    showtimeStatusJob();
     seatStatusJob();
     movieStatusJob();
     server.listen(PORT, () => {
