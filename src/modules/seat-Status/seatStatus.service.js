@@ -4,6 +4,7 @@ import Showtime from "../showtimes/showtime.model.js";
 import SeatStatus from "./seatStatus.model.js";
 import { SEAT_STATUS } from "../../common/constants/seatStatus.js";
 import dayjs from "dayjs";
+import { getIO } from "../socket/socket.instance.js";
 
 export const getSeatStatusByShowtimeService = async (
   roomId,
