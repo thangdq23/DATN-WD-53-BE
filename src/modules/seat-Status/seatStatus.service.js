@@ -1,88 +1,104 @@
 import { throwError } from "../../common/utils/create-response.js";
+import Seat from "../seat/seat.model.js";
+import Showtime from "../showtimes/showtime.model.js";
 import SeatStatus from "./seatStatus.model.js";
+import { SEAT_STATUS } from "../../common/constants/seatStatus.js";
+import dayjs from "dayjs";
 
-export const getSeatStatusByShowtimeService = async (showtimeId) => {
-  const data = await SeatStatus.find({ showtimeId })
-    .populate("seatId")
-    .populate("userId");
-  return data;
-};
+export const getSeatStatusByShowtimeService = async (
+  roomId,
+  showtimeId,
+  query,
+) => {
+  const seats = await Seat.find({ roomId, ...query }).lean();
+  const seatSchedules = await SeatStatus.find({ showtimeId }).lean();
+  const schedulesDate = await Showtime.findById(showtimeId);
 
-export const holeSeatService = async ({ seatId, showtimeId, userId }) => {
-  const now = new Date();
-  const expiredHold = new Date(now.getTime() + 5 * 60 * 1000);
-  const exist = await SeatStatus.findOne({ seatId, showtimeId });
-
-  if (exist) {
-    if (
-      exist.status === "hold" &&
-      exist.expiredHold &&
-      exist.expiredHold > now &&
-      String(exist.userId) !== String(userId)
-    ) {
-      throwError(400, "Ghế đang được giữ bởi người khác");
-    }
-
-    exist.status = "hold";
-    exist.userId = userId;
-    exist.expiredHold = expiredHold;
-    await exist.save();
+  const result = seats.map((seat) => {
+    const schedule = seatSchedules.find(
+      (s) => s.seatId.toString() === seat._toString(),
+    );
 
     return {
-      message: "Giữ ghế thành công",
-      expiredHold: expiredHold,
-      seatStatus: exist,
+      ...seat,
+      userId: schedule?.userId || null,
+      price: schedulesDate.price,
+      bookingStatus: schedule?.status || "available",
     };
-  }
-
-  const created = await SeatStatus.create({
-    seatId,
-    showtimeId,
-    userId,
-    statusL: "hold",
-    expiredHold: expiredHold,
   });
+
+  const getCols = () => Math.max(...result.map((s) => s.col || 1));
+  const getRows = () => Math.max(...result.map((s) => s.row || 1));
   return {
-    message: "Giữ ghế thành công",
-    expiredHold: expiredHold,
-    seatStatus: created,
+    rows: getRows(),
+    cols: getCols(),
+    seats: result,
   };
 };
 
-export const releaseSeatService = async ({ seatId, showtimeId, userId }) => {
-  const seat = await SeatStatus.findOne({ seatId, showtimeId });
+export const toggleSeatService = async ({ payload, userId }) => {
+  const existing = await SeatStatus.findOne({ seatId: payload.seatId });
+  if (existing) {
+    if (existing.userId?.toString() !== userId?.toString()) {
+      const isHold = existing.status === SEAT_STATUS.HOLD;
+      throwError(
+        400,
+        `Ghế ${isHold ? "đang được giữ!" : "đã được đặt trước đó!"}`,
+      );
+    }
 
-  if (!seat) throwError(400, "Ghế chưa được giữ hoặc đặt");
-  if (String(seat.userId) !== String(userId)) {
-    throwError(400, "Bạn không phải người giữ ghế này");
+    if (existing.status === SEAT_STATUS.HOLD) {
+      await existing.deleteOne();
+      const io = getIO();
+      io.to(existing.showtimeId.toString()).emit("seatUpdate", {
+        seatId: existing.seatId,
+        scheduleId: existing.showtimeId,
+        status: "available",
+      });
+      return { message: "Đã bỏ giữ ghế" };
+    }
+    if (existing.status === "booked") {
+      throwError(400, "Bạn đã đặt ghế này rồi!");
+    }
   }
 
-  seat.userId = null;
-  seat.expiredHold = null;
-  seat.status = "hold";
-  await seat.save();
+  const count = await SeatStatus.countDocuments({
+    userId,
+    status: SEAT_STATUS.HOLD,
+  });
 
-  return {
-    message: "Hủy giữ ghế thành công",
-    seatStatus: seat,
-  };
+  if (count === 4)
+    throwError(400, "Bạn chỉ được phép giữ 4 ghé. Để đảm bảo hệ thống!");
+  const seat = await SeatStatus.create({ userId, ...payload });
+  const io = getIO();
+  io.to(payload.showtimeId.toString()).emit("seatUpdated", {
+    seatId: seat.seatId,
+    scheduleId: seat.showtimeId,
+    status: seat.status,
+  });
+  return seat;
 };
 
-export const clearExpiredSeatHoldService = async () => {
-  const now = new Date();
+export const unHoldSeatService = async (userId) => {
+  const holdSeats = await SeatStatus.find({
+    userId,
+    status: SEAT_STATUS.HOLD,
+  }).lean();
 
-  const result = await SeatStatus.updateMany(
-    {
-      status: "hold",
-      expiredHold: { $lt: now },
-    },
-    {
-      $set: {
-        userId: null,
-        expiredHold: null,
-      },
-    },
-  );
+  if (holdSeats.length === 0) return 0;
+  const showtimeIds = [...new Set(holdSeats.map((s) => String(s.showtimeId)))];
+  const result = await SeatStatus.deleteMany({
+    userId,
+    status: SEAT_STATUS.HOLD,
+  });
 
-  return result;
+  const io = getIO();
+  showtimeIds.forEach((showtimeId) => {
+    io.to(showtimeId).emit("seatUpdate", {
+      message: "Một số ghế giữ chỗ đã hết hạn!",
+      deleteCount: result.deletedCount,
+      timestamp: dayjs().toISOString(),
+    });
+  });
+  return result.deletedCount;
 };
