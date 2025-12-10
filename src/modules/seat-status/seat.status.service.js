@@ -58,7 +58,7 @@ export const toggleSeatService = async ({ payload, userId }) => {
       });
       return { message: "Đã bỏ giữ ghế" };
     }
-    if (existing.status === "booked") {
+    if (existing.status === SEAT_STATUS.BOOKED) {
       throwError(400, "Bạn đã đặt ghế này rồi!");
     }
   }
@@ -66,10 +66,11 @@ export const toggleSeatService = async ({ payload, userId }) => {
   const count = await SeatStatus.countDocuments({
     userId,
     status: SEAT_STATUS.HOLD,
+    showtimeId: payload.showtimeId,
   });
 
-  if (count === 4)
-    throwError(400, "Bạn chỉ được phép giữ 4 ghé. Để đảm bảo hệ thống!");
+  if (count === 12)
+    throwError(400, "Bạn chỉ được phép giữ 12 ghế trong 1 lần đặt vé!");
   const seat = await SeatStatus.create({ userId, ...payload });
   const io = getIO();
   io.to(payload.showtimeId.toString()).emit("seatUpdated", {
