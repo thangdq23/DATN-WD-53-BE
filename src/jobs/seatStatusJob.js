@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import cron from "node-cron";
-import SeatStatus from "../modules/seat-Status/seatStatus.model.js";
+import SeatStatus from "../modules/seat-status/seat.status.model.js";
 import { SEAT_STATUS } from "../common/constants/seatStatus.js";
 import { getIO } from "../modules/socket/socket.instance.js";
 

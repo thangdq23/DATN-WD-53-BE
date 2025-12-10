@@ -6,7 +6,7 @@ import {
   getSeatStatusByShowtimeService,
   toggleSeatService,
   unHoldSeatService,
-} from "./seatStatus.service.js";
+} from "./seat.status.service.js";
 
 export const getSeatShowtime = handleAsync(async (req, res) => {
   const { roomId, showtimeId } = req.params;
