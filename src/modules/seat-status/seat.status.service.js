@@ -37,7 +37,7 @@ export const getSeatStatusByShowtimeService = async (
   };
 };
 
-export const toggleSeatService = async ({ payload, userId }) => {
+export const toggleSeatService = async (payload, userId) => {
   const existing = await SeatStatus.findOne({
     showtimeId: payload.showtimeId,
     seatId: payload.seatId,
