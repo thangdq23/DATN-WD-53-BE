@@ -15,7 +15,7 @@ routes.use("/genre", genreRoute);
 routes.use("/movie", movieRoute);
 routes.use("/room", roomRoute);
 routes.use("/showtime", showtimeRoute);
-routes.use("/seatStatus", seatStatusRoute);
+routes.use("/seat-status", seatStatusRoute);
 routes.use("/checkout", checkoutRoute);
 routes.use("/user", userRoute);
 
