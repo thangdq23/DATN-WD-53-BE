@@ -1,50 +1,42 @@
+import { apiQuery } from "../../common/utils/api-query.js";
 import { throwError } from "../../common/utils/create-response.js";
-import { queryHelper } from "../../common/utils/query-helper.js";
-import { AUTH_MESSAGES } from "../auth/auth.messages.js";
-import { comparePassword, hashPassword } from "../auth/auth.utils.js";
-import Ticket from "../ticket/ticket.model.js";
 import User from "./user.model.js";
+import bcrypt from "bcryptjs";
 
-export const getProfileService = async (userId) => {
-  const user = await User.findById(userId);
-  if (!user) {
-    throwError(401, AUTH_MESSAGES.NOTFOUND_USER);
+export const getAllUserService = async (query) => {
+  const data = await apiQuery(User, query);
+  return data;
+};
+
+export const createUserService = async (data) => {
+  const { email, password } = data;
+
+  const existedEmail = await User.findOne({ email });
+  if (existedEmail) {
+    throwError(400, "Email đã tồn tại!");
   }
-  return user;
-};
 
-export const updateProfileService = async (payload, userId) => {
-  const user = await User.findById(userId);
-  if (!user) throwError(400, "Không tìm thấy người dùng");
-  const allowedFields = ["userName", "phone", "avatar"];
-  allowedFields.forEach((field) => {
-    if (payload[field] !== undefined) {
-      user[field] = payload[field];
-    }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = await User.create({
+    ...data,
+    password: hashedPassword,
   });
-  await user.save();
-  return user;
+
+  return newUser;
 };
 
-export const changePasswordService = async (payload, userId) => {
-  const user = await User.findById(userId);
-  if (!user) throwError(400, "Không tìm thấy người dùng!");
-  const isMatchOldPassword = await comparePassword(
-    payload.oldPassword,
-    user.password,
-  );
-  if (!isMatchOldPassword) throwError(400, "Mật khẩu không chính xác!");
-  const hashNewPassword = await hashPassword(payload.newPassword);
-  user.password = hashNewPassword;
-  return await user.save();
-};
+export const updateUserService = async (id, data) => {
+  const user = await User.findById(id);
+  if (!user) throwError(404, "Không tìm thấy user!");
 
-export const getMyticketService = async (userId, query) => {
-  const tickets = await queryHelper(Ticket, { userId, ...query });
-  return tickets;
-};
+  if (data.email && data.email !== user.email) {
+    const existedEmail = await User.findOne({ email: data.email });
+    if (existedEmail) throwError(400, "Email đã được sử dụng!");
+  }
 
-export const getMyDetailTicketService = async (userId, ticketId) => {
-  const ticket = await Ticket.findOne({ userId, _id: ticketId });
-  return ticket;
+  if (data.password) {
+    data.password = await bcrypt.hash(data.password, 10);
+  }
+
+  const updated = await User.findByIdAndUpdate(id, data, { new: true });
 };
