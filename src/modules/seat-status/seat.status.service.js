@@ -17,7 +17,7 @@ export const getSeatStatusByShowtimeService = async (
 
   const result = seats.map((seat) => {
     const schedule = seatSchedules.find(
-      (s) => s.seatId.toString() === seat._toString(),
+      (s) => s.seatId.toString() === seat._id.toString(),
     );
 
     return {
