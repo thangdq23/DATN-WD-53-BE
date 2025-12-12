@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const seatSchema = new mongoose.Schema(
   {
+    id: {
+      type: String,
+      required: true,
+    },
     roomId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Room",
@@ -38,6 +42,7 @@ const seatSchema = new mongoose.Schema(
     versionKey: false,
   },
 );
+seatSchema.index({ id: 1, roomId: 1 }, { unique: true });
 
 const Seat = mongoose.model("Seat", seatSchema);
 export default Seat;
