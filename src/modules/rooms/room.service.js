@@ -37,43 +37,73 @@ export const createRoomService = async (payload) => {
 };
 
 export const updateRoomService = async (id, payload) => {
-  const { seats, ...rest } = payload;
-  const existed = await Room.findOne({
-    _id: { $ne: id },
-    name: { $regex: `^${payload.name}$`, $options: "i" },
-  });
-  if (existed) throwError(400, "Phòng chiếu này đã tồn tại trong hệ thống!");
+  const { seats, rows, cols, ...rest } = payload;
 
-  const updatedRoom = await Room.findByIdAndUpdate(id, rest, { new: true });
-  if (!updatedRoom)
-    throwError(404, "Phòng chiếu không tồn tại trong hệ thống!");
-  if (seats && seats.length > 0) {
-    const existingSeats = await Seat.find({ roomId: id });
-    const bulkops = seats
-      .map((seat) => {
-        const exist = existingSeats.find((s) => s._id.toString() === seat._id);
-        if (!exist) return null;
-        if (exist.status !== seat.status || exist.type !== seat.type) {
-          return {
-            updateOne: {
-              filter: { _id: seat._id, roomId: id },
-              update: {
-                $set: {
-                  status: seat.status,
-                  type: seat.type,
-                },
-              },
-            },
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-    if (bulkops.length > 0) {
-      await Seat.bulkWrite(bulkops);
+  const updatedRoom = await Room.findByIdAndUpdate(
+    id,
+    { ...rest, rows, cols },
+    { new: true },
+  );
+  if (!updatedRoom) throwError(404, "Phòng chiếu không tồn tại!");
+  const existingSeats = await Seat.find({ roomId: id });
+  const seatIdsFromFE = seats.map((s) => s.id);
+  await Seat.deleteMany({
+    roomId: id,
+    id: { $nin: seatIdsFromFE },
+  });
+  const bulkOps = [];
+  seats.forEach((feSeat) => {
+    const dbSeat = existingSeats.find((d) => d.id === feSeat.id);
+    if (!dbSeat) {
+      bulkOps.push({
+        insertOne: {
+          document: {
+            id: feSeat.id,
+            roomId: id,
+            row: feSeat.row,
+            col: feSeat.col,
+            label: feSeat.label,
+            type: feSeat.type,
+            status: feSeat.status,
+            span: feSeat.span || 1,
+          },
+        },
+      });
+      return;
     }
+    const changed =
+      dbSeat.row !== feSeat.row ||
+      dbSeat.col !== feSeat.col ||
+      dbSeat.label !== feSeat.label ||
+      dbSeat.type !== feSeat.type ||
+      dbSeat.status !== feSeat.status ||
+      dbSeat.span !== (feSeat.span || 1);
+    if(changed) {
+      bulkOps.push({
+        deleteOne: {
+          filter: { roomId: id, id: feSeat.id },
+        },
+      });
+      bulkOps.push({
+        insertOne: {
+          document: {
+            id: feSeat.id,
+            roomId: id,
+            row: feSeat.row,
+            col: feSeat.col,
+            label: feSeat.label,
+            type: feSeat.type,
+            status: feSeat.status,
+            span: feSeat.span || 1,
+          },
+        },
+      });
+    }  
+  });
+  if (bulkOps.length > 0) {
+    await Seat.bulkWrite(bulkOps);
   }
-  return updatedRoom;
+return updatedRoom;
 };
 
 export const updateRoomStatusService = async (id) => {
