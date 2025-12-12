@@ -7,8 +7,14 @@ import {
 } from "./user.service.js";
 
 export const getAllUser = handleAsync(async (req, res) => {
-  const users = await getAllUserService();
-  return createResponse(res, 200, "Lấy danh sách thành công!", users);
+  const users = await getAllUserService(req.query);
+  return createResponse(
+    res,
+    200,
+    "Lấy danh sách thành công!",
+    users.data,
+    users.meta,
+  );
 });
 
 export const createUser = handleAsync(async (req, res) => {
