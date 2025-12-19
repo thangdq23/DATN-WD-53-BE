@@ -18,7 +18,7 @@ export const getSeatStatusByShowtimeService = async (
 
   const result = seats.map((seat) => {
     const schedule = seatSchedules.find(
-      (s) => s.seatId.toString() === seat._toString(),
+      (s) => s.seatId.toString() === seat._id.toString(),
     );
 
     return {
@@ -38,9 +38,13 @@ export const getSeatStatusByShowtimeService = async (
   };
 };
 
+
 export const toggleSeatService = async ({ payload, userId }) => {
   const room = await Room.findById(payload.roomId);
   const rowSeats = await SeatStatus.find({
+export const toggleSeatService = async (payload, userId) => {
+  const existing = await SeatStatus.findOne({
+
     showtimeId: payload.showtimeId,
     row: payload.seatId,
     status: { $in: [SEAT_STATUS.HOLD, SEAT_STATUS.BOOKED] },

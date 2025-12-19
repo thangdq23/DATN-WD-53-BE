@@ -9,7 +9,7 @@ import {
 import { authenticate } from "../../common/middlewares/auth.middleware.js";
 
 const seatStatusRoute = Router();
-seatStatusRoute.get("/seat-map/:rooId/:showtimeId", getSeatShowtime);
+seatStatusRoute.get("/seat-map/:roomId/:showtimeId", getSeatShowtime);
 seatStatusRoute.use(authenticate(JWT_ACCESS_SECRET));
 seatStatusRoute.post("/toggle-seat", toggleSeat);
 seatStatusRoute.patch("/un-hold", unHoldSeat);

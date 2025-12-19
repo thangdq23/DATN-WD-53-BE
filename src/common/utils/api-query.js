@@ -12,6 +12,7 @@ export const apiQuery = async (Model, queryParams, options = {}) => {
     isDeleted,
     ...filters
   } = queryParams;
+  console.log(searchFields);
 
   const { populate = [] } = options;
 
