@@ -43,6 +43,41 @@ export const toggleSeatService = async ({ payload, userId }) => {
   const room = await Room.findById(payload.roomId);
   const rowSeats = await SeatStatus.find({
 export const toggleSeatService = async (payload, userId) => {
+  const room = await Room.findById(payload.roomId);
+  const rowSeats = await SeatStatus.find({
+    showtimeId: payload.showtimeId,
+    row: payload.seatId,
+    status: { $in: [SEAT_STATUS.HOLD, SEAT_STATUS.BOOKED] },
+    typeSeat: { $ne: "COUPLE" },
+  });
+
+  console.log(rowSeats);
+  const existingCols = rowSeats.map((s) => s.col);
+  if (
+    payload.col === 2 &&
+    !existingCols.includes(1) &&
+    !existingCols.includes(2)
+  ) {
+    throwError(400, "Vẫn còn ghế trống bên trái không thể mua ghế vừa chọn!");
+  }
+  if (
+    payload.col === room.cols - 1 &&
+    !existingCols.includes(room.cols) &&
+    !existingCols.includes(room.cols - 2)
+  ) {
+    throwError(400, "Vẫn còn ghế trống bên phải không thể mua ghế vừa chọn!");
+  }
+  const allCols = [...existingCols, payload.col].sort((a, b) => a - b);
+  for (let i = 0; i < allCols.length - 1; i++) {
+    const diff = allCols[i + 1] - allCols[i];
+    if (diff === 2) {
+      throwError(
+        400,
+        "Mua ghế tạo ghế trống, Quý khách nên chọn ghế bên cạnh!",
+      );
+    }
+  }
+
   const existing = await SeatStatus.findOne({
 
     showtimeId: payload.showtimeId,
