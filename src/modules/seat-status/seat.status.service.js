@@ -38,7 +38,7 @@ export const getSeatStatusByShowtimeService = async (
   };
 };
 
-export const toggleSeatService = async ({ payload, userId }) => {
+export const toggleSeatService = async (payload, userId) => {
   const room = await Room.findById(payload.roomId);
   const rowSeats = await SeatStatus.find({
     showtimeId: payload.showtimeId,

@@ -1,10 +1,10 @@
 import cron from "node-cron";
-import dayjs from "dayjs";
 import Movie from "../modules/movie/movie.model.js";
 
-export const startMovieStatusJob = async () => {
+export const functionUpdateMovie = async () => {
   try {
-    const today = dayjs().startOf("day").toDate();
+    const today = new Date();
+
     await Movie.updateMany({}, [
       {
         $set: {
@@ -20,24 +20,25 @@ export const startMovieStatusJob = async () => {
         },
       },
     ]);
-    console.log("Cập nhật statusRelease cho tất cả phim thành công!");
+
+    console.log("Cập nhật statusRelease thành công!");
   } catch (err) {
-    console.log("Lỗi khi cập nhật statusRelease:" , err);
+    console.error("Lỗi khi cập nhật statusRelease:", err);
   }
 };
 
-let isCronStarted =  false;
+let isCronStarted = false;
 
 export const movieStatusJob = () => {
   if (isCronStarted) return;
   isCronStarted = true;
   console.log("START MOVIE STATUS CRON JOB");
-  startMovieStatusJob();
+  functionUpdateMovie();
   cron.schedule(
     "0 0 * * *",
     async () => {
       console.log("CRON: Updating movie status");
-      await startMovieStatusJob();
+      await functionUpdateMovie();
     },
     {
       timezone: "Asia/Ho_Chi_Minh",
