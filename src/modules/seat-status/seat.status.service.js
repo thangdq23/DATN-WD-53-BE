@@ -14,7 +14,7 @@ export const getSeatStatusByShowtimeService = async (
 ) => {
   const seats = await Seat.find({ roomId, ...query }).lean();
   const seatSchedules = await SeatStatus.find({ showtimeId }).lean();
-  const schedulesDate = await Showtime.findById(showtimeId);
+  const scheduleData = await Showtime.findById(showtimeId);
 
   const result = seats.map((seat) => {
     const schedule = seatSchedules.find(
@@ -24,11 +24,10 @@ export const getSeatStatusByShowtimeService = async (
     return {
       ...seat,
       userId: schedule?.userId || null,
-      price: schedulesDate.price,
+      price: scheduleData.price,
       bookingStatus: schedule?.status || "available",
     };
   });
-
   const getCols = () => Math.max(...result.map((s) => s.col || 1));
   const getRows = () => Math.max(...result.map((s) => s.row || 1));
   return {
@@ -42,24 +41,15 @@ export const toggleSeatService = async (payload, userId) => {
   const room = await Room.findById(payload.roomId);
   const rowSeats = await SeatStatus.find({
     showtimeId: payload.showtimeId,
-    row: payload.seatId,
+    row: payload.row,
     status: { $in: [SEAT_STATUS.HOLD, SEAT_STATUS.BOOKED] },
     typeSeat: { $ne: "COUPLE" },
   });
-
-  const existing = await SeatStatus.findOne({
-    showtimeId: payload.showtimeId,
-    row: payload.seatId,
-    status: { $in: [SEAT_STATUS.HOLD, SEAT_STATUS.BOOKED] },
-    typeSeat: { $ne: "COUPLE" },
-  });
-
-  console.log(rowSeats);
   const existingCols = rowSeats.map((s) => s.col);
   if (
     payload.col === 2 &&
     !existingCols.includes(1) &&
-    !existingCols.includes(2)
+    !existingCols.includes(3)
   ) {
     throwError(400, "Vẫn còn ghế trống bên trái không thể mua ghế vừa chọn!");
   }
@@ -80,11 +70,16 @@ export const toggleSeatService = async (payload, userId) => {
       );
     }
   }
+  const existing = await SeatStatus.findOne({
+    showtimeId: payload.showtimeId,
+    seatId: payload.seatId,
+  });
   if (existing && existing.status === SEAT_STATUS.HOLD) {
     const remainingCols = rowSeats
       .filter((s) => s.seatId.toString() !== payload.seatId)
       .map((s) => s.col)
       .sort((a, b) => a - b);
+
     if (remainingCols.length > 0) {
       for (let i = 0; i < remainingCols.length - 1; i++) {
         const diff = remainingCols[i + 1] - remainingCols[i];
@@ -118,13 +113,11 @@ export const toggleSeatService = async (payload, userId) => {
     });
     return { message: "Đã bỏ giữ ghế" };
   }
-
   const seat = await SeatStatus.create({
     userId,
     typeSeat: payload.type,
     ...payload,
   });
-
   const io = getIO();
   io.to(payload.showtimeId.toString()).emit("seatUpdated", {
     seatId: seat.seatId,
