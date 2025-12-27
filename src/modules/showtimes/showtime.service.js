@@ -33,8 +33,8 @@ export const getShowtimesByWeekdayService = async (query) => {
 };
 
 export const getDetailShowtimeService = async (id) => {
-  const showtime = (await Showtime.findById(id))
-    .populated("movieId")
+  const showtime = await Showtime.findById(id)
+    .populate("movieId")
     .populate("roomId");
   return showtime;
 };

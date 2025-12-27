@@ -8,6 +8,7 @@ import {
   getShowtimesByWeekdayService,
   getMovieHasShowtimeService,
   updateShowtimeService,
+  getDetailShowtimeService,
 } from "./showtime.service.js";
 import { DAY_NAMES } from "../../common/constants/showtime.js";
 
@@ -15,6 +16,12 @@ export const getAllShowtime = handleAsync(async (req, res) => {
   const { query } = req;
   const showtimes = await getAllShowtimeService(query);
   return createResponse(res, 200, "OK", showtimes.data, showtimes.data);
+});
+
+export const getDetailShowtime = handleAsync(async (req, res) => {
+  const { id } = req.params;
+  const data = await getDetailShowtimeService(id);
+  return createResponse(res, 200, "OK", data);
 });
 
 export const getShowtimesByWeekday = handleAsync(async (req, res) => {
