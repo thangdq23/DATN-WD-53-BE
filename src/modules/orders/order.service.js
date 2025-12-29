@@ -12,6 +12,8 @@ import {
   checkShowtimeAvaiable,
   generateCode,
   generatePaymentCode,
+  updateSeatsToBooked,
+  updateShowtimeStatus,
 } from "./order.utils.js";
 import { checkAvaiableMovie } from "../showtimes/showtime.utils.js";
 import { extendHoldSeatTime } from "../seat-status/seat.status.service.js";
@@ -23,7 +25,7 @@ const payOS = new PayOS({
 });
 
 export const checkoutService = async (payload) => {
- const { seats, showtimeId, userId } = payload;
+  const { seats, showtimeId, userId } = payload;
   if (!seats.length) throwError(400, "Yêu cầu gửi lên ghế");
   const ticketId = generateCode();
   await checkAvaiableMovie(payload.movieId);
@@ -49,4 +51,17 @@ export const getMyOrdersService = async (userId, query) => {
   const filters = { ...query, userId };
   const result = await apiQuery(Order, filters);
   return result;
+};
+
+export const checkoutReturnPayosService = async (params) => {
+  const order = await Order.findOne({ codePayment: params.orderCode });
+  if (!order) return false;
+  const seatIds = order.seats.map((item) => item.seatId);
+  await checkingHoldSeat(order.userId, order.showtimeId, seatIds);
+  await updateSeatsToBooked(order.showtimeId, seatIds);
+  await updateShowtimeStatus(order.showtimeId);
+  order.isPaid = true;
+  order.status = "buyed";
+  await order.save();
+  return order;
 };
