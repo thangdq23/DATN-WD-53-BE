@@ -10,6 +10,9 @@ const envVarsSchema = z.object({
   DB_URI: z.string().min(1).describe("Local Mongo DB"),
   JWT_ACCESS_SECRET: z.string().min(1).default("change_this_secret"),
   JWT_ACCESS_EXPIRED: z.string().default("7d"),
+  PAYOS_CLIENT_ID: z.string(),
+  PAYOS_API_KEY: z.string(),
+  PAYOS_CHECKSUM_KEY: z.string(),
 });
 const result = envVarsSchema.safeParse(process.env);
 if (!result.success) {
@@ -30,4 +33,7 @@ export const {
   DB_URI,
   JWT_ACCESS_SECRET,
   JWT_ACCESS_EXPIRED,
+  PAYOS_CLIENT_ID,
+  PAYOS_API_KEY,
+  PAYOS_CHECKSUM_KEY,
 } = envVars;

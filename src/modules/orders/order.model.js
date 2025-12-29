@@ -2,6 +2,14 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
+     codePayment: {
+      type: Number,
+      required: true,
+    },
+    ticketId: {
+      type: String,
+      required: true,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -9,6 +17,38 @@ const orderSchema = new mongoose.Schema(
     showtimeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Showtime",
+      required: true,
+    },
+     customerInfo: {
+      type: {
+        email: {
+          type: String,
+          required: true,
+        },
+        userName: {
+          type: String,
+          required: true,
+        },
+        phone: {
+          type: String,
+          required: true,
+        },
+      },
+    },
+    movieId: {
+      type: String,
+      required: true,
+    },
+    movieName: {
+      type: String,
+      required: true,
+    },
+    roomId: {
+      type: String,
+      required: true,
+    },
+    roomName: {
+      type: String,
       required: true,
     },
     seats: [
@@ -24,22 +64,22 @@ const orderSchema = new mongoose.Schema(
         price: { type: Number, required: true },
       },
     ],
+    startTime: {
+      type: Date,
+      required: true,
+    },
     totalAmount: {
       type: Number,
       required: true,
     },
-    paymentMethod: {
-      type: String,
-      default: "cash",
-    },
     status: {
       type: String,
-      enum: ["pending", "paid", "cancelled"],
-      default: "paid",
+      enum: ["buyed", "used", "cancelled"],
+      default: "buyed",
     },
-    code: {
-      type: String,
-      unique: true,
+    isPaid: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true, versionKey: false },
