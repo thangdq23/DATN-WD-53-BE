@@ -28,11 +28,16 @@ export const checkoutService = async (payload) => {
   const { seats, showtimeId, userId } = payload;
   if (!seats.length) throwError(400, "Yêu cầu gửi lên ghế");
   const ticketId = generateCode();
-  await checkAvaiableMovie(payload.movieId);
+  const movie = await checkAvaiableMovie(payload.movieId);
   await checkShowtimeAvaiable(payload.showtimeId);
   await checkingHoldSeat(payload.userId, payload.showtimeId, payload.seats);
   const codePayment = generatePaymentCode();
-  const order = await Order.create({ ...payload, ticketId, codePayment });
+  const order = await Order.create({
+    ...payload,
+    moviePoster: movie.poster,
+    ticketId,
+    codePayment,
+  });
   const paymentData = {
     orderCode: codePayment,
     amount: order.totalAmount,

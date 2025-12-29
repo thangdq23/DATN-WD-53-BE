@@ -43,6 +43,10 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    moviePoster: {
+      type: String,
+      required: true,
+    },
     roomId: {
       type: String,
       required: true,
