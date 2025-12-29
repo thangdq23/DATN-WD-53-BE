@@ -61,8 +61,7 @@ export const checkingHoldSeat = async (userId, showtimeId, seatsPayload) => {
   return seats;
 };
 
-export const updateSeatsToBooked = async (userId, showtimeId, seatId) => {
-  const seats = await checkingHoldSeat(userId, showtimeId, seatId);
+export const updateSeatsToBooked = async (showtimeId, seatId) => {
   const result = await SeatStatus.updateMany(
     {
       seatId: { $in: seatId.map((item) => item._id) },
@@ -76,7 +75,6 @@ export const updateSeatsToBooked = async (userId, showtimeId, seatId) => {
   });
   return {
     modifiedCount: result.modifiedCount,
-    bookedSeats: seats.map((s) => s.seatLabel),
   };
 };
 
@@ -93,4 +91,17 @@ export const checkAvaiableSeat = async (seatIds) => {
     );
   }
   return seats;
+};
+
+export const updateShowtimeStatus = async (showtimeId) => {
+  const showtime = await Showtime.findById(showtimeId).populate("roomId");
+  if (!showtime) throwError(400, "Showtime không tồn tại");
+  const seatBooked = await SeatStatus.find({
+    showtimeId,
+    status: SEAT_STATUS.BOOKED,
+  });
+  if (seatBooked.length === showtime.roomId.capacity)
+    showtime.status = SHOWTIME_STATUS.SOLD_OUT;
+  await showtime.save();
+  return showtime;
 };

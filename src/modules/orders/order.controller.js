@@ -1,7 +1,10 @@
 import handleAsync from "../../common/utils/async-handler.js";
 import createResponse from "../../common/utils/create-response.js";
-import { checkoutService } from "./order.service.js";
-import { getMyOrdersService } from "./order.service.js";
+import {
+  checkoutReturnPayosService,
+  checkoutService,
+  getMyOrdersService,
+} from "./order.service.js";
 
 export const checkout = handleAsync(async (req, res) => {
   const { body } = req;
@@ -16,4 +19,16 @@ export const getMyOrders = handleAsync(async (req, res) => {
   const { query } = req;
   const { data, meta } = await getMyOrdersService(userId, query);
   return createResponse(res, 200, "OK", data, meta);
+});
+
+export const checkoutReturnPayos = handleAsync(async (req, res) => {
+  const { query } = req;
+  if (!query.status || query.status === "CANCELLED") {
+    return res.redirect("http://localhost:5173/payment/failed");
+  }
+  const data = await checkoutReturnPayosService(query);
+  if (!data) {
+    res.redirect("http://localhost:5173/payment/failed");
+  }
+  return res.redirect("http://localhost:5173/payment/success");
 });

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
-     codePayment: {
+    codePayment: {
       type: Number,
       required: true,
     },
@@ -19,7 +19,7 @@ const orderSchema = new mongoose.Schema(
       ref: "Showtime",
       required: true,
     },
-     customerInfo: {
+    customerInfo: {
       type: {
         email: {
           type: String,
@@ -40,6 +40,10 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     movieName: {
+      type: String,
+      required: true,
+    },
+    moviePoster: {
       type: String,
       required: true,
     },
@@ -74,8 +78,8 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["buyed", "used", "cancelled"],
-      default: "buyed",
+      enum: ["pending", "buyed", "used", "cancelled"],
+      default: "pending",
     },
     isPaid: {
       type: Boolean,
