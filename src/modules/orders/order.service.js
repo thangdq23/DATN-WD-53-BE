@@ -51,6 +51,11 @@ export const checkoutService = async (payload) => {
   return paymentLink.checkoutUrl;
 };
 
+export const getAllOrderService = async (query) => {
+  const res = await apiQuery(Order, query);
+  return res;
+};
+
 export const getMyOrdersService = async (userId, query) => {
   if (!userId) throwError(400, "Thiếu thông tin người dùng!");
   const filters = { ...query, userId };

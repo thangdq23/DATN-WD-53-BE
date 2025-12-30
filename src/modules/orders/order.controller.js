@@ -3,6 +3,7 @@ import createResponse from "../../common/utils/create-response.js";
 import {
   checkoutReturnPayosService,
   checkoutService,
+  getAllOrderService,
   getDetailOrderService,
   getMyOrdersService,
 } from "./order.service.js";
@@ -13,6 +14,12 @@ export const checkout = handleAsync(async (req, res) => {
   if (userId) body.userId = userId;
   const data = await checkoutService(body);
   return createResponse(res, 201, "Đặt vé thành công", data);
+});
+
+export const getAllOrder = handleAsync(async (req, res) => {
+  const { query } = res;
+  const { data, meta } = await getAllOrderService(query);
+  return createResponse(res, 200, "OK", data, meta);
 });
 
 export const getMyOrders = handleAsync(async (req, res) => {
