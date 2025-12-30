@@ -17,7 +17,7 @@ export const checkout = handleAsync(async (req, res) => {
 });
 
 export const getAllOrder = handleAsync(async (req, res) => {
-  const { query } = res;
+  const { query } = req;
   const { data, meta } = await getAllOrderService(query);
   return createResponse(res, 200, "OK", data, meta);
 });
