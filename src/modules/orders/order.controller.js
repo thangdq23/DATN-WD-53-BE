@@ -3,6 +3,7 @@ import createResponse from "../../common/utils/create-response.js";
 import {
   checkoutReturnPayosService,
   checkoutService,
+  getDetailOrderService,
   getMyOrdersService,
 } from "./order.service.js";
 
@@ -21,6 +22,12 @@ export const getMyOrders = handleAsync(async (req, res) => {
   return createResponse(res, 200, "OK", data, meta);
 });
 
+export const getDetailOrder = handleAsync(async (req, res) => {
+  const { id } = req.params;
+  const data = await getDetailOrderService(id);
+  return createResponse(res, 200, "OK", data);
+});
+
 export const checkoutReturnPayos = handleAsync(async (req, res) => {
   const { query } = req;
   if (!query.status || query.status === "CANCELLED") {
@@ -30,5 +37,5 @@ export const checkoutReturnPayos = handleAsync(async (req, res) => {
   if (!data) {
     res.redirect("http://localhost:5173/payment/failed");
   }
-  return res.redirect("http://localhost:5173/payment/success");
+  return res.redirect(`http://localhost:5173/payment/success/${data._id}`);
 });
