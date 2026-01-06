@@ -9,6 +9,7 @@ import seatStatusRoute from "./modules/seat-status/seat.status.routes.js";
 import seatRoute from "./modules/seat/seat.route.js";
 import showtimeRoute from "./modules/showtimes/showtime.routes.js";
 import userRoute from "./modules/user/user.routes.js";
+import statsRoute from "./modules/stats/stats.routes.js";
 
 const routes = Router();
 
@@ -21,5 +22,6 @@ routes.use("/seat-status", seatStatusRoute);
 routes.use("/order", orderRoute);
 routes.use("/user", userRoute);
 routes.use("/seat", seatRoute);
+routes.use("/api/v1/stats", statsRoute);
 
 export default routes;
