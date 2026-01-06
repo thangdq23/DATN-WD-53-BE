@@ -1,13 +1,14 @@
 import dayjs from "dayjs";
 import handleAsync from "../../../common/utils/async-handler.js";
 import createResponse from "../../../common/utils/create-response.js";
-import { applyFilter } from "../../../common/utils/query-helper.js";
+
 import { applyQuickFilter } from "../stats.utils.js";
 import {
   getOverviewStatsService,
   getOverviewByMonthService,
   getTopRevenueMoviesService,
 } from "./overview.service.js";
+import { applyFilter } from "../../../common/utils/api-query.js";
 
 export const getOverviewStats = handleAsync(async (req, res) => {
   const match = {};
