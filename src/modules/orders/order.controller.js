@@ -6,6 +6,8 @@ import {
   getAllOrderService,
   getDetailOrderService,
   getMyOrdersService,
+  verifyOrderService,
+  updateOrderStatusService,
 } from "./order.service.js";
 
 export const checkout = handleAsync(async (req, res) => {
@@ -45,4 +47,22 @@ export const checkoutReturnPayos = handleAsync(async (req, res) => {
     res.redirect("http://localhost:5173/payment/failed");
   }
   return res.redirect(`http://localhost:5173/payment/success/${data._id}`);
+});
+
+export const verifyOrder = handleAsync(async (req, res) => {
+  const { code } = req.query;
+  const data = await verifyOrderService(code);
+  return createResponse(res, 200, "OK", data);
+});
+
+export const updateOrderStatus = handleAsync(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const data = await updateOrderStatusService(id, status, req.user);
+  return createResponse(
+    res,
+    200,
+    "Cập nhật trạng thái thành công",
+    data
+  );
 });
