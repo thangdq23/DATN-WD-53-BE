@@ -94,10 +94,10 @@ export const verifyOrderService = async (code) => {
   if (!order) return { order: null, scanStatus: "INVALID" };
 
   const now = new Date();
-  if (order.isPaid === "cancelled") return { order, scanStatus: "CANCELLED" };
+  if (!order.isPaid) return { order, scanStatus: "NOT_PAID" };
+  if (order.status === "cancelled") return { order, scanStatus: "CANCELLED" };
   if (order.status === "used") return { order, scanStatus: "USED" };
-  if (new Date(order.startTime) < now)
-    return { order, scanStatus: "EXPIRED" };
+  if (new Date(order.startTime) < now) return { order, scanStatus: "EXPIRED" };
 
   return { order, scanStatus: "OK" };
 };
@@ -107,17 +107,13 @@ export const updateOrderStatusService = async (id, status, user) => {
   if (!order) throwError(400, "Không tìm thấy đơn hàng");
 
   const allowed = ["pending", "buyed", "used", "cancelled"];
-  if (!allowed.includes(status))
-    throwError(400, "Trạng thái không hợp lệ");
+  if (!allowed.includes(status)) throwError(400, "Trạng thái không hợp lệ");
 
   const now = new Date();
   if (status === "used") {
-    if (order.isPaid !== "success")
-      throwError(400, "Vé chưa được thanh toán");
-    if (order.status === "used")
-      throwError(400, "Vé đã được quét");
-    if (order.status === "cancelled")
-      throwError(400, "Vé đã bị huỷ");
+    if (!order.isPaid) throwError(400, "Vé chưa thanh toán");
+    if (order.status === "used") throwError(400, "Vé đã được quét");
+    if (order.status === "cancelled") throwError(400, "Vé đã bị hủy");
     if (new Date(order.startTime) < now)
       throwError(400, "Showtime đã kết thúc");
   }

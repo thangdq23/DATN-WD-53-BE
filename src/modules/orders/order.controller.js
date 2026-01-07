@@ -59,10 +59,5 @@ export const updateOrderStatus = handleAsync(async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const data = await updateOrderStatusService(id, status, req.user);
-  return createResponse(
-    res,
-    200,
-    "Cập nhật trạng thái thành công",
-    data
-  );
+  return createResponse(res, 200, "OK, cập nhật trạng thái thành công", data);
 });
