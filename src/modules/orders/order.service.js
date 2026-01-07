@@ -81,3 +81,48 @@ export const checkoutReturnPayosService = async (params) => {
   await order.save();
   return order;
 };
+
+export const verifyOrderService = async (code) => {
+  if (!code) return { order: null, scanStatus: "INVALID" };
+  const clean = String(code).trim().toUpperCase();
+
+  let order = await Order.findOne({ ticketId: clean });
+  if (!order) {
+    const prefixed = clean.startsWith("MPV-") ? clean : `MPV-${clean}`;
+    order = await Order.findOne({ ticketId: prefixed });
+  }
+  if (!order) return { order: null, scanStatus: "INVALID" };
+
+  const now = new Date();
+  if (order.isPaid === "cancelled") return { order, scanStatus: "CANCELLED" };
+  if (order.status === "used") return { order, scanStatus: "USED" };
+  if (new Date(order.startTime) < now)
+    return { order, scanStatus: "EXPIRED" };
+
+  return { order, scanStatus: "OK" };
+};
+
+export const updateOrderStatusService = async (id, status, user) => {
+  const order = await Order.findById(id);
+  if (!order) throwError(400, "Không tìm thấy đơn hàng");
+
+  const allowed = ["pending", "buyed", "used", "cancelled"];
+  if (!allowed.includes(status))
+    throwError(400, "Trạng thái không hợp lệ");
+
+  const now = new Date();
+  if (status === "used") {
+    if (order.isPaid !== "success")
+      throwError(400, "Vé chưa được thanh toán");
+    if (order.status === "used")
+      throwError(400, "Vé đã được quét");
+    if (order.status === "cancelled")
+      throwError(400, "Vé đã bị huỷ");
+    if (new Date(order.startTime) < now)
+      throwError(400, "Showtime đã kết thúc");
+  }
+
+  order.status = status;
+  await order.save();
+  return order;
+};
