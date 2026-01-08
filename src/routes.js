@@ -22,6 +22,6 @@ routes.use("/seat-status", seatStatusRoute);
 routes.use("/order", orderRoute);
 routes.use("/user", userRoute);
 routes.use("/seat", seatRoute);
-routes.use("/api/v1/stats", statsRoute);
+routes.use("/v1/stats", statsRoute);
 
 export default routes;
