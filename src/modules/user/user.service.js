@@ -41,3 +41,17 @@ export const updateUserService = async (id, data) => {
   const updated = await User.findByIdAndUpdate(id, data, { new: true });
   return updated;
 };
+
+export const changePasswordService = async (userId, payload) => {
+  const { currentPassword, newPassword } = payload;
+  const user = await User.findById(userId);
+  if (!user) throwError(404, "Không tìm thấy user!");
+
+  const match = await bcrypt.compare(currentPassword, user.password);
+  if (!match) throwError(400, "Mật khẩu hiện tại không đúng!");
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+
+  return user;
+};
