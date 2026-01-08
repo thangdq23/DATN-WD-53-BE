@@ -7,6 +7,10 @@ import {
   getOverviewStatsService,
   getOverviewByMonthService,
   getTopRevenueMoviesService,
+  getOverviewByRangeService,
+  getTopMoviesByTicketsService,
+  getShowtimeStatsService,
+  getRoomStatsService,
 } from "./overview.service.js";
 import { applyFilter } from "../../../common/utils/api-query.js";
 
@@ -58,5 +62,55 @@ export const getTopRevenueMovies = handleAsync(async (req, res) => {
   }
 
   const data = await getTopRevenueMoviesService(match);
+  return createResponse(res, 200, "OK", data);
+});
+
+export const getOverviewByRange = handleAsync(async (req, res) => {
+  const { granularity = "day", createdAtFrom, createdAtTo } = req.query;
+  const range = {
+    $gte: createdAtFrom ? new Date(createdAtFrom) : new Date(0),
+    $lte: createdAtTo ? new Date(createdAtTo) : new Date(),
+  };
+
+  const data = await getOverviewByRangeService(range, granularity);
+  return createResponse(res, 200, "OK", { granularity, result: data });
+});
+
+export const getTopMoviesByTickets = handleAsync(async (req, res) => {
+  const match = {};
+  Object.entries(req.query).forEach(([k, v]) => applyFilter(k, v, match));
+  if (match.quickFilter) {
+    const { createdAtFrom, createdAtTo } = applyQuickFilter(match.quickFilter);
+    match.createdAt = { $gte: createdAtFrom, $lte: createdAtTo };
+    delete match.quickFilter;
+  }
+
+  const data = await getTopMoviesByTicketsService(match);
+  return createResponse(res, 200, "OK", data);
+});
+
+export const getShowtimeStats = handleAsync(async (req, res) => {
+  const match = {};
+  Object.entries(req.query).forEach(([k, v]) => applyFilter(k, v, match));
+  if (match.quickFilter) {
+    const { createdAtFrom, createdAtTo } = applyQuickFilter(match.quickFilter);
+    match.createdAt = { $gte: createdAtFrom, $lte: createdAtTo };
+    delete match.quickFilter;
+  }
+
+  const data = await getShowtimeStatsService(match);
+  return createResponse(res, 200, "OK", data);
+});
+
+export const getRoomStats = handleAsync(async (req, res) => {
+  const match = {};
+  Object.entries(req.query).forEach(([k, v]) => applyFilter(k, v, match));
+  if (match.quickFilter) {
+    const { createdAtFrom, createdAtTo } = applyQuickFilter(match.quickFilter);
+    match.createdAt = { $gte: createdAtFrom, $lte: createdAtTo };
+    delete match.quickFilter;
+  }
+
+  const data = await getRoomStatsService(match);
   return createResponse(res, 200, "OK", data);
 });
