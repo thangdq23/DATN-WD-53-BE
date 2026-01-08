@@ -4,6 +4,7 @@ import {
   createUserService,
   getAllUserService,
   updateUserService,
+  changePasswordService,
 } from "./user.service.js";
 
 export const getAllUser = handleAsync(async (req, res) => {
@@ -25,4 +26,10 @@ export const createUser = handleAsync(async (req, res) => {
 export const updateUser = handleAsync(async (req, res) => {
   const users = await updateUserService(req.params.id, req.body);
   return createResponse(res, 200, "Cập nhật user thành công", users);
+});
+
+export const changePassword = handleAsync(async (req, res) => {
+  const userId = req.user?._id;
+  await changePasswordService(userId, req.body);
+  return createResponse(res, 200, "Đổi mật khẩu thành công");
 });
