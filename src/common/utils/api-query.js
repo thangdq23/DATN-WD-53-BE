@@ -1,4 +1,4 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 
 export const apiQuery = async (Model, queryParams, options = {}) => {
   let {
@@ -8,7 +8,7 @@ export const apiQuery = async (Model, queryParams, options = {}) => {
     order = "desc",
     search,
     searchFields = [],
-    pagination = true,
+    pagination = false,
     isDeleted,
     ...filters
   } = queryParams;
@@ -79,7 +79,7 @@ export const apiQuery = async (Model, queryParams, options = {}) => {
   return { data };
 };
 
-function applyFilter(key, value, queryConditions) {
+export function applyFilter(key, value, queryConditions) {
   if (value == null || value === "") return;
 
   if (value === "__nullOrEmpty__") {
