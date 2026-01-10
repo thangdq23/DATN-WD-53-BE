@@ -328,7 +328,7 @@ export const getSendTicketTemplateMail = ({ ticket }) => {
     roomName,
     startTime,
     items,
-    totalPrice,
+    totalAmount,
     customerInfo,
   } = ticket;
   const seats = items?.map((item) => item.seatLabel).join(", ");
@@ -402,7 +402,7 @@ export const getSendTicketTemplateMail = ({ ticket }) => {
                 <tr>
                   <td width="150" style="font-weight:bold;">Tổng tiền:</td>
                   <td style="font-size:18px; font-weight:bold; color:blue;">
-                    ${totalPrice.toLocaleString()}đ
+                    ${totalAmount.toLocaleString()}đ
                   </td>
                 </tr>
               </table>
