@@ -13,6 +13,8 @@ const envVarsSchema = z.object({
   PAYOS_CLIENT_ID: z.string(),
   PAYOS_API_KEY: z.string(),
   PAYOS_CHECKSUM_KEY: z.string(),
+  EMAIL_USER: z.string(),
+  EMAIL_PASSWORD: z.string(),
 });
 const result = envVarsSchema.safeParse(process.env);
 if (!result.success) {
@@ -36,4 +38,6 @@ export const {
   PAYOS_CLIENT_ID,
   PAYOS_API_KEY,
   PAYOS_CHECKSUM_KEY,
+  EMAIL_USER,
+  EMAIL_PASSWORD,
 } = envVars;

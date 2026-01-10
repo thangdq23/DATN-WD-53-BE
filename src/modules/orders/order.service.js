@@ -17,6 +17,9 @@ import {
 } from "./order.utils.js";
 import { checkAvaiableMovie } from "../showtimes/showtime.utils.js";
 import { extendHoldSeatTime } from "../seat-status/seat.status.service.js";
+import { sendMail } from "../mail/sendMail.js";
+import { getSendTicketTemplateMail } from "../mail/mail.template.js";
+import QRCode from "qrcode";
 
 const payOS = new PayOS({
   clientId: PAYOS_CLIENT_ID,
@@ -79,6 +82,22 @@ export const checkoutReturnPayosService = async (params) => {
   order.isPaid = true;
   order.status = "buyed";
   await order.save();
+  const qrBuffer = await QRCode.toBuffer(order.ticketId, {
+    type: "png",
+    width: 220,
+  });
+  await sendMail(
+    order.customerInfo.email,
+    "MPV - Vé xem phim của bạn",
+    getSendTicketTemplateMail({ ticket: order }),
+    [
+      {
+        filename: "qr.png",
+        content: qrBuffer,
+        cid: "qr_ticket",
+      },
+    ],
+  );
   return order;
 };
 
