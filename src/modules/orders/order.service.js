@@ -17,6 +17,7 @@ import {
 } from "./order.utils.js";
 import { checkAvaiableMovie } from "../showtimes/showtime.utils.js";
 import { extendHoldSeatTime } from "../seat-status/seat.status.service.js";
+import { unHoldSeatService } from "../seat-status/seat.status.service.js";
 import { sendMail } from "../mail/sendMail.js";
 import { getSendTicketTemplateMail } from "../mail/mail.template.js";
 import QRCode from "qrcode";
@@ -75,6 +76,20 @@ export const getDetailOrderService = async (id) => {
 export const checkoutReturnPayosService = async (params) => {
   const order = await Order.findOne({ codePayment: params.orderCode });
   if (!order) return false;
+
+  const statusFromGateway = (params.status || "").toUpperCase();
+  if (statusFromGateway === "CANCELLED") {
+    try {
+      const seatIds = order.seats.map((item) => item.seatId);
+      await unHoldSeatService(order.userId, order.showtimeId, seatIds);
+    } catch (e) {
+      console.error("Error releasing held seats on cancelled payment:", e);
+    }
+    order.status = "cancelled";
+    await order.save();
+    return order;
+  }
+
   const seatIds = order.seats.map((item) => item.seatId);
   await checkingHoldSeat(order.userId, order.showtimeId, seatIds);
   await updateSeatsToBooked(order.showtimeId, seatIds);
