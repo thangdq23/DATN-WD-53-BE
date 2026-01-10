@@ -39,13 +39,18 @@ export const getDetailOrder = handleAsync(async (req, res) => {
 
 export const checkoutReturnPayos = handleAsync(async (req, res) => {
   const { query } = req;
-  if (!query.status || query.status === "CANCELLED") {
-    return res.redirect("http://localhost:5173/payment/failed");
-  }
+
   const data = await checkoutReturnPayosService(query);
   if (!data) {
-    res.redirect("http://localhost:5173/payment/failed");
+    return res.redirect("http://localhost:5173/payment/failed");
   }
+
+
+  const statusFromGateway = (query.status || "").toUpperCase();
+  if (statusFromGateway === "CANCELLED") {
+    return res.redirect("http://localhost:5173/payment/failed");
+  }
+
   return res.redirect(`http://localhost:5173/payment/success/${data._id}`);
 });
 
