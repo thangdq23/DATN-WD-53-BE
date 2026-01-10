@@ -328,10 +328,15 @@ export const getSendTicketTemplateMail = ({ ticket }) => {
     roomName,
     startTime,
     items,
+    seats: seatsFromOrder,
     totalAmount,
     customerInfo,
   } = ticket;
-  const seats = items?.map((item) => item.seatLabel).join(", ");
+  const normalizedItems = items ?? seatsFromOrder ?? [];
+  const seats = normalizedItems
+    .map((item) => item?.seatLabel ?? item?.label ?? "")
+    .filter(Boolean)
+    .join(", ");
 
   return `
     <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5; padding:30px 0; font-family:Arial, sans-serif;">
